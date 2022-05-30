@@ -1,17 +1,28 @@
-import React, {useState} from 'react';
-import {Text} from 'react-native';
+import React, {useEffect} from 'react';
+import {Alert, Text} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
-import {LoadingView} from 'react-native-loading-view';
 
 export const CameraScreen: React.FC = () => {
-  const [hasPermission, setHasPermission] = useState(false);
+  const checkCameraPermission = async () => {
+    let status = await Camera.getCameraPermissionStatus();
+    if (status !== 'authorized') {
+      await Camera.requestCameraPermission();
+      status = await Camera.getCameraPermissionStatus();
+      if (status === 'denied') {
+        Alert.alert(
+          'You will not be able to scan if you do not allow camera access',
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkCameraPermission();
+  }, []);
 
   const devices = useCameraDevices();
   const device = devices.back;
-  if (device == null) {
-    return <LoadingView />;
-  }
   return (
     <SafeAreaView>
       <>

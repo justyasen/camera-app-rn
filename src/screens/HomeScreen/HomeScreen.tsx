@@ -1,8 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {SafeAreaView, Text, TouchableOpacity} from 'react-native';
-import {CAMERA_ROUTE, GALLERY_ROUTE} from '../routes';
-import {NavigationProps} from '../types/NavigationProps';
+import {CAMERA_ROUTE, GALLERY_ROUTE} from '../../routes';
+import {NavigationProps} from '../../types/NavigationProps';
 
 export const HomeScreen: React.FC = () => {
   //router
