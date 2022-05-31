@@ -26,7 +26,7 @@ const App = () => {
         <Stack.Screen
           name={CAMERA_ROUTE}
           component={CameraScreen}
-          options={{headerShown: true, title: 'Take a picture! '}}
+          options={{headerShown: false, title: 'Take a picture! '}}
         />
         <Stack.Screen
           name={GALLERY_ROUTE}
