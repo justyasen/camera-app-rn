@@ -1,9 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Button, Text, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Camera, useCameraDevices} from 'react-native-vision-camera';
+import {Camera, PhotoFile, useCameraDevices} from 'react-native-vision-camera';
 import {styles} from './styles';
-import Icon from 'react-native-vector-icons/FontAwesome';
+
+export let photo: PhotoFile | undefined;
 
 export const CameraScreen: React.FC = () => {
   const devices = useCameraDevices();
@@ -11,10 +12,12 @@ export const CameraScreen: React.FC = () => {
   const camera = useRef<Camera>();
 
   const takePicture = async () => {
-    const photo = await camera?.current?.takePhoto({
+    photo = await camera?.current?.takePhoto({
       flash: 'auto',
       qualityPrioritization: 'quality',
     });
+    setPictureHasBeenTaken(prevPictureTaken => !prevPictureTaken);
+    console.warn(photo);
   };
 
   //useState to keep track of permissions and whether picture has been taken
@@ -34,15 +37,15 @@ export const CameraScreen: React.FC = () => {
     return <ActivityIndicator size="large" color="blue" />;
   }
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.safeAreaView}>
       <Camera
         device={device}
         isActive={true}
         photo={true}
         style={styles.cameraView}
       />
-      <TouchableOpacity style={styles.takePictureBtn}>
-        <Icon name="rocket" />
+      <TouchableOpacity style={styles.takePictureBtn} onPress={takePicture}>
+        <Text> Shoot </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

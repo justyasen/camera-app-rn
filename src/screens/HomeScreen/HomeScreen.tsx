@@ -1,9 +1,11 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import {Alert, SafeAreaView, Text, TouchableOpacity} from 'react-native';
+import {Alert, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {CAMERA_ROUTE, GALLERY_ROUTE} from '../../routes';
 import {NavigationProps} from '../../types/NavigationProps';
 import {Camera} from 'react-native-vision-camera';
+
+import {styles} from './styles';
 
 export const HomeScreen: React.FC = () => {
   //router
