@@ -31,7 +31,7 @@ const App = () => {
         <Stack.Screen
           name={GALLERY_ROUTE}
           component={GalleryScreen}
-          options={{headerShown: false}}
+          options={{headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     textAlign: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: 50,
     alignItems: 'center',
   },
   safeAreaView: {
