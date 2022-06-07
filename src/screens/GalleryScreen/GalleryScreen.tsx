@@ -22,15 +22,20 @@ export const GalleryScreen: React.FC = () => {
 
   useEffect(() => {
     hasAndroidPermission();
+    getData();
   });
 
   const getData = async () => {
     try {
-      const jsonValue: string | null = await AsyncStorage.getItem('@photo_key');
-      setImageURI(jsonValue);
-      return jsonValue != null ? JSON.stringify(jsonValue) : null;
-    } catch (e) {
-      // error reading value
+      const photoFromLocalStorage: string = await AsyncStorage.getItem(
+        '@photo_key',
+      );
+      console.log('@photo_key', photoFromLocalStorage);
+      if (photoFromLocalStorage !== null) {
+        setImageURI(photoFromLocalStorage);
+      }
+    } catch (error) {
+      console.warn(error);
     }
   };
   return (
