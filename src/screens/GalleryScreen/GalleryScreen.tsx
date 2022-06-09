@@ -39,7 +39,7 @@ export const GalleryScreen: React.FC = () => {
     }
   };
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <Image style={styles.image} source={{uri: imageURI}} />
       </ScrollView>
