@@ -1,6 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {HOME_ROUTE, CAMERA_ROUTE, GALLERY_ROUTE} from './src/routes/routes';
 import {CameraScreen} from './src/screens/CameraScreen/';
 import {GalleryScreen} from './src/screens/GalleryScreen';
@@ -21,7 +21,10 @@ const App = () => {
         <Stack.Screen
           name={HOME_ROUTE}
           component={HomeScreen}
-          options={{headerShown: true, title: 'Welcome to the Camera App! '}}
+          options={{
+            headerShown: true,
+            title: 'A picture is worth a thousand words! ',
+          }}
         />
         <Stack.Screen
           name={CAMERA_ROUTE}

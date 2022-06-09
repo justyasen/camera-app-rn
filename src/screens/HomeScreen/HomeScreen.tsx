@@ -1,6 +1,13 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import {Alert, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  ImageBackground,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {CAMERA_ROUTE, GALLERY_ROUTE} from '../../routes';
 import {NavigationProps} from '../../types/NavigationProps';
 import {Camera} from 'react-native-vision-camera';
@@ -31,17 +38,31 @@ export const HomeScreen: React.FC = () => {
   const navigateToCameraScreen = () => navigation.navigate(CAMERA_ROUTE);
   const navigateToGalleryScreen = () => navigation.navigate(GALLERY_ROUTE);
   return (
-    <SafeAreaView>
-      <>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.parentButtons}>
         {/* Navigate to Camera */}
         <TouchableOpacity onPress={navigateToCameraScreen}>
-          <Text> Camera </Text>
+          <ImageBackground
+            style={styles.backgroundImageCamera}
+            imageStyle={styles.imageStyle}
+            source={require('../../img/camera_icon.png')}>
+            <View>
+              <Text style={styles.textInsideImage}> </Text>
+            </View>
+          </ImageBackground>
         </TouchableOpacity>
         {/* Navigate to Gallery */}
         <TouchableOpacity onPress={navigateToGalleryScreen}>
-          <Text> Gallery </Text>
+          <ImageBackground
+            style={styles.backgroundImageGallery}
+            imageStyle={styles.imageStyle}
+            source={require('../../img/gallery_icon.png')}>
+            <View>
+              <Text style={styles.textInsideImage}> </Text>
+            </View>
+          </ImageBackground>
         </TouchableOpacity>
-      </>
+      </View>
     </SafeAreaView>
   );
 };

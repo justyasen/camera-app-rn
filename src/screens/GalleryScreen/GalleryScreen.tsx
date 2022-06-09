@@ -27,7 +27,7 @@ export const GalleryScreen: React.FC = () => {
 
   const getData = async () => {
     try {
-      const photoFromLocalStorage: string = await AsyncStorage.getItem(
+      const photoFromLocalStorage: string | null = await AsyncStorage.getItem(
         '@photo_key',
       );
       console.log('@photo_key', photoFromLocalStorage);
