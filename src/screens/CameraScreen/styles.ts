@@ -24,4 +24,18 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  galleryButton: {
+    borderWidth: 1,
+    borderColor: 'white',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    bottom: -30,
+    left: 50,
+    right: 50,
+    position: 'absolute',
+    textAlign: 'center',
+    justifyContent: 'center',
+    marginBottom: 50,
+    alignItems: 'center',
+  },
 });

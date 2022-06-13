@@ -1,48 +1,44 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {Image, PermissionsAndroid, ScrollView} from 'react-native';
+import {Alert, Image} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {PhotoFile} from 'react-native-vision-camera';
+import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
 import {styles} from './styles';
 
-//Async function returning whether user has given permission
-async function hasAndroidPermission() {
-  const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-
-  const hasPermission = await PermissionsAndroid.check(permission);
-  if (hasPermission) {
-    return true;
-  }
-
-  const status = await PermissionsAndroid.request(permission);
-  return status === 'granted';
-}
-
 export const GalleryScreen: React.FC = () => {
-  const [imageURI, setImageURI] = useState<string>();
+  const [photo, setPhoto] = useState<PhotoFile>();
 
   useEffect(() => {
     hasAndroidPermission();
-    getData();
-  });
+  }, []);
 
-  const getData = async () => {
+  /**
+   *
+   * Returns a photo file from local storage and sets it in a local state, if it is not *null*
+   */
+  const getPhoto = async () => {
     try {
-      const photoFromLocalStorage: string | null = await AsyncStorage.getItem(
-        '@photo_key',
-      );
-      console.log('@photo_key', photoFromLocalStorage);
-      if (photoFromLocalStorage !== null) {
-        setImageURI(photoFromLocalStorage);
+      const photoFromLocalStorage = await AsyncStorage.getItem('@photo_key');
+      if (photoFromLocalStorage === null) {
+        Alert.alert('No photo from local storage');
+      } else {
+        const photoJSON: PhotoFile = JSON.parse(photoFromLocalStorage);
+        setPhoto(photoJSON);
+        console.log(photoJSON);
       }
+      //test console.log for debugging purposes.
     } catch (error) {
       console.warn(error);
     }
   };
+
+  useEffect(() => {
+    getPhoto();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <Image style={styles.image} source={{uri: imageURI}} />
-      </ScrollView>
+      <Image style={styles.image} source={{uri: 'file://' + photo?.path}} />
     </SafeAreaView>
   );
 };

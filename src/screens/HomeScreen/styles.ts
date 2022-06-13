@@ -7,23 +7,25 @@ export const styles = StyleSheet.create({
   parentButtons: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    padding: 5,
+    justifyContent: 'space-between',
+    padding: 20,
     top: 500,
+    paddingLeft: 2,
+    paddingRight: 2,
   },
-  backgroundImageCamera: {
+  cameraIcon: {
     backgroundColor: 'gray',
     padding: 2,
-    width: '390%',
+    width: '2800%',
     height: 90,
-    right: 50,
+    right: -80,
   },
-  backgroundImageGallery: {
+  galleryIcon: {
     backgroundColor: 'gray',
     padding: 2,
-    width: '350%',
+    width: '3000%',
     height: 90,
-    left: -20,
+    left: -160,
   },
   imageStyle: {
     borderRadius: 0,

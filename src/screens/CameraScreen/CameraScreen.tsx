@@ -1,70 +1,99 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, Text, TouchableOpacity} from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import {Alert, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Camera, PhotoFile, useCameraDevices} from 'react-native-vision-camera';
 import {GALLERY_ROUTE} from '../../routes';
 import {NavigationProps} from '../../types/NavigationProps';
 import {styles} from './styles';
+import {checkCameraPermission} from '../../permissions/checkCameraPermission';
+import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
 
+//да се запазват снимките в масив или нещо подобно, оправи черния екран в камера екрана като се върнеш в него(най-вероятно edge case) някакъв cleanup (може в app.tsx да се чистят снимките от AsyncStorage)
+//статуса да ползвам от закоментираната част по надолу да се показва някакво съобщение или пак да се показва рекуест за пермишъни
 export const CameraScreen: React.FC = () => {
-  //All variables for vision camera
+  //All variables for Vision camera
   const devices = useCameraDevices();
-  const device = devices.back;
-  const camera = useRef<Camera>();
+  const cameraBackDevice = devices.back;
+  const camera = useRef<Camera>(null);
 
-  //values for async storage
-
-  //States
-  const [hasPermission, setHasPermission] = useState<Boolean>(false);
-
-  const storeData = async (value: PhotoFile | undefined) => {
-    try {
-      const jsonValue: string | null = JSON.stringify(value);
-      await AsyncStorage.setItem('@photo_key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
-  };
-  //navigating to gallery
+  //Hooks
   const navigation = useNavigation<NavigationProps>();
   const navigateToGalleryScreen = () => navigation.navigate(GALLERY_ROUTE);
 
-  //take a pic
-  const takePicture = async () => {
-    const photo: PhotoFile | undefined = await camera?.current?.takePhoto();
-    storeData(photo);
-  };
+  //Commented out for debugging purposes
+  // //States
+  // const [hasPermission, setHasPermission] = useState<Boolean>(false);
 
+  // useEffect(() => {
+  //   checkCameraPermission();
+  // }, []);
+
+  // const checkCameraPermission = async () => {
+  //   const status = await Camera.getCameraPermissionStatus();
+  //   setHasPermission(() => status === 'authorized');
+  // };
   useEffect(() => {
     checkCameraPermission();
-  }, []);
+    hasAndroidPermission();
+  }, [camera]);
 
-  const checkCameraPermission = async () => {
-    const status = await Camera.getCameraPermissionStatus();
-    setHasPermission(() => status === 'authorized');
+  const hasBackCamera =
+    cameraBackDevice !== null && cameraBackDevice !== undefined;
+
+  const storePhoto = async (photo: PhotoFile) => {
+    try {
+      const photoJSON: string = JSON.stringify(photo);
+      await AsyncStorage.setItem('@photo_key', photoJSON);
+    } catch (e) {
+      Alert.alert(
+        'Storing Error',
+        'Had problem storing photo, please contact technical support.',
+      );
+      console.warn(e);
+      return photo;
+    }
   };
 
-  if (device == null) {
-    return <ActivityIndicator size="large" color="blue" />;
-  }
+  const takePhotoAndStoreIt = async () => {
+    if (!camera || !camera.current) {
+      Alert.alert('No active camera. ');
+    } else {
+      const photo: PhotoFile = await camera.current.takePhoto();
+      storePhoto(photo);
+    }
+  };
   return (
     <SafeAreaView style={styles.safeAreaView}>
-      <Camera
-        device={device}
-        isActive={true}
-        photo={true}
-        style={styles.cameraView}
-      />
-      <TouchableOpacity
-        style={styles.takePictureBtn}
-        onPress={() => {
-          takePicture();
-          navigateToGalleryScreen();
-        }}>
-        <Text> Shoot </Text>
-      </TouchableOpacity>
+      {!hasBackCamera && (
+        <View>
+          <Text>There are no camera devices.</Text>
+        </View>
+      )}
+      {hasBackCamera && (
+        <>
+          <Camera
+            ref={camera}
+            device={cameraBackDevice}
+            isActive
+            photo
+            style={styles.cameraView}
+          />
+
+          <TouchableOpacity
+            style={styles.takePictureBtn}
+            onPress={takePhotoAndStoreIt}>
+            <Text> Shoot </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.galleryButton}
+            onPress={navigateToGalleryScreen}>
+            <Text> Gallery </Text>
+          </TouchableOpacity>
+        </>
+      )}
     </SafeAreaView>
   );
 };
