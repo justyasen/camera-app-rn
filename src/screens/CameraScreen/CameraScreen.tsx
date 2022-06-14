@@ -1,17 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Camera, PhotoFile, useCameraDevices} from 'react-native-vision-camera';
+import {checkCameraPermission} from '../../permissions/checkCameraPermission';
+import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
 import {GALLERY_ROUTE} from '../../routes';
 import {NavigationProps} from '../../types/NavigationProps';
 import {styles} from './styles';
-import {checkCameraPermission} from '../../permissions/checkCameraPermission';
-import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
 
-//да се запазват снимките в масив или нещо подобно, оправи черния екран в камера екрана като се върнеш в него(най-вероятно edge case) някакъв cleanup (може в app.tsx да се чистят снимките от AsyncStorage)
-//статуса да ползвам от закоментираната част по надолу да се показва някакво съобщение или пак да се показва рекуест за пермишъни
 export const CameraScreen: React.FC = () => {
   //All variables for Vision camera
   const devices = useCameraDevices();
@@ -21,17 +19,13 @@ export const CameraScreen: React.FC = () => {
   //Hooks
   const navigation = useNavigation<NavigationProps>();
   const navigateToGalleryScreen = () => navigation.navigate(GALLERY_ROUTE);
+  //States
+  const [photoID, setPhotoID] = useState('');
 
   //Commented out for debugging purposes
-  // //States
-  // const [hasPermission, setHasPermission] = useState<Boolean>(false);
-
-  // useEffect(() => {
-  //   checkCameraPermission();
-  // }, []);
 
   // const checkCameraPermission = async () => {
-  //   const status = await Camera.getCameraPermissionStatus();
+  //   const status = await Camera.getCameraPermissio(use the commented out part) if status is not authorized alert or pop up againStatus();
   //   setHasPermission(() => status === 'authorized');
   // };
   useEffect(() => {
@@ -42,10 +36,27 @@ export const CameraScreen: React.FC = () => {
   const hasBackCamera =
     cameraBackDevice !== null && cameraBackDevice !== undefined;
 
-  const storePhoto = async (photo: PhotoFile) => {
+  const makeKey = () => {
+    const possible =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (var i = 0; i < 5; i++) {
+      let key =
+        '' + possible.charAt(Math.floor(Math.random() * possible.length));
+      setPhotoID(key);
+    }
+    console.log(photoID);
+  };
+
+  const storePhoto = async (photo: PhotoFile, _id: string) => {
     try {
-      const photoJSON: string = JSON.stringify(photo);
-      await AsyncStorage.setItem('@photo_key', photoJSON);
+      await AsyncStorage.setItem(
+        '@photo_key',
+        JSON.stringify({
+          photoID: photoID,
+          photo: photo,
+        }),
+      );
     } catch (e) {
       Alert.alert(
         'Storing Error',
@@ -60,8 +71,10 @@ export const CameraScreen: React.FC = () => {
     if (!camera || !camera.current) {
       Alert.alert('No active camera. ');
     } else {
+      makeKey();
       const photo: PhotoFile = await camera.current.takePhoto();
-      storePhoto(photo);
+      storePhoto(photo, photoID);
+      console.log(photoID);
     }
   };
   return (
