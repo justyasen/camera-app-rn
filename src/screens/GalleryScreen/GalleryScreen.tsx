@@ -9,8 +9,6 @@ import {styles} from './styles';
 export const GalleryScreen: React.FC = () => {
   //Hooks
   const [photo, setPhoto] = useState<PhotoFile>();
-  const [photoID, setPhotoID] = useState<string>('');
-
   useEffect(() => {
     hasAndroidPermission();
   }, []);
@@ -50,10 +48,7 @@ export const GalleryScreen: React.FC = () => {
         Alert.alert('No photo from local storage');
       } else {
         const photoJSON: PhotoFile = JSON.parse(photoFromLocalStorage).photo;
-        const photoIDJSON = JSON.parse(photoFromLocalStorage).photoID;
         setPhoto(photoJSON);
-        setPhotoID(photoIDJSON);
-        console.log(photoIDJSON);
       }
     } catch (error) {
       console.warn(error);

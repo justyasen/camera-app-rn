@@ -11,6 +11,8 @@ export const checkCameraPermission = async () => {
     status = await Camera.getCameraPermissionStatus();
     if (status === 'denied') {
       Alert.alert('You cannot take a picture if you do not allow camera use. ');
+      await Camera.requestCameraPermission();
     }
   }
+  return status;
 };

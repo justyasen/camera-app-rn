@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Alert, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Camera, PhotoFile, useCameraDevices} from 'react-native-vision-camera';
@@ -19,15 +19,7 @@ export const CameraScreen: React.FC = () => {
   //Hooks
   const navigation = useNavigation<NavigationProps>();
   const navigateToGalleryScreen = () => navigation.navigate(GALLERY_ROUTE);
-  //States
-  const [photoID, setPhotoID] = useState('');
 
-  //Commented out for debugging purposes
-
-  // const checkCameraPermission = async () => {
-  //   const status = await Camera.getCameraPermissio(use the commented out part) if status is not authorized alert or pop up againStatus();
-  //   setHasPermission(() => status === 'authorized');
-  // };
   useEffect(() => {
     checkCameraPermission();
     hasAndroidPermission();
@@ -36,24 +28,11 @@ export const CameraScreen: React.FC = () => {
   const hasBackCamera =
     cameraBackDevice !== null && cameraBackDevice !== undefined;
 
-  const makeKey = () => {
-    const possible =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < 5; i++) {
-      let key =
-        '' + possible.charAt(Math.floor(Math.random() * possible.length));
-      setPhotoID(key);
-    }
-    console.log(photoID);
-  };
-
-  const storePhoto = async (photo: PhotoFile, _id: string) => {
+  const storePhoto = async (photo: PhotoFile) => {
     try {
       await AsyncStorage.setItem(
         '@photo_key',
         JSON.stringify({
-          photoID: photoID,
           photo: photo,
         }),
       );
@@ -71,10 +50,8 @@ export const CameraScreen: React.FC = () => {
     if (!camera || !camera.current) {
       Alert.alert('No active camera. ');
     } else {
-      makeKey();
       const photo: PhotoFile = await camera.current.takePhoto();
-      storePhoto(photo, photoID);
-      console.log(photoID);
+      storePhoto(photo);
     }
   };
   return (
