@@ -14,5 +14,4 @@ export const checkCameraPermission = async () => {
       await Camera.requestCameraPermission();
     }
   }
-  return status;
 };
