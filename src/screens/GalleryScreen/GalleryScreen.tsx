@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {Alert, Image, TouchableOpacity} from 'react-native';
+import {Alert, FlatList, Image} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {PhotoFile} from 'react-native-vision-camera';
 import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
 import {styles} from './styles';
 
 export const GalleryScreen: React.FC = () => {
   //Hooks
-  const [photo, setPhoto] = useState<PhotoFile>();
+  const [photoArray, setPhotoArrayState] = useState();
+
   useEffect(() => {
     hasAndroidPermission();
   }, []);
@@ -16,6 +16,7 @@ export const GalleryScreen: React.FC = () => {
   useEffect(() => {
     getPhoto();
   }, []);
+
   const photoKey: string = '@photo_key';
 
   /**
@@ -26,7 +27,7 @@ export const GalleryScreen: React.FC = () => {
   const deletePhoto = async (key: string) => {
     try {
       await AsyncStorage.removeItem(key);
-      setPhoto(undefined);
+      setPhotoArrayState(undefined);
     } catch (err) {
       console.log(err);
     }
@@ -43,23 +44,34 @@ export const GalleryScreen: React.FC = () => {
    */
   const getPhoto = async () => {
     try {
-      const photoFromLocalStorage = await AsyncStorage.getItem(photoKey);
-      if (photoFromLocalStorage === null) {
-        Alert.alert('No photo from local storage');
+      const photoArrayFromLocalStorage = await AsyncStorage.getItem(photoKey);
+      if (photoArrayFromLocalStorage === null) {
+        Alert.alert('No photos from local storage');
+        return null;
       } else {
-        const photoJSON: PhotoFile = JSON.parse(photoFromLocalStorage).photo;
-        setPhoto(photoJSON);
+        const photoArrayJSON = JSON.parse(photoArrayFromLocalStorage);
+        setPhotoArrayState(photoArrayJSON);
+        console.log(photoArrayJSON);
       }
     } catch (error) {
+      Alert.alert('Something went wrong at GalleryScreen PhotoJSON');
       console.warn(error);
     }
   };
+  // const renderedPhoto = ({photo}: PhotoFile) => {
+  //   <TouchableOpacity onLongPress={onLongPress}>
+  //     <Image style={styles.image} source={{uri: 'file://' + photo.path}} />
+  //   </TouchableOpacity>;
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onLongPress={onLongPress}>
-        <Image style={styles.image} source={{uri: 'file://' + photo?.path}} />
-      </TouchableOpacity>
+      <FlatList
+        data={photoArray}
+        renderItem={({item}) => (
+          <Image style={styles.image} source={{uri: 'file://' + item.path}} />
+        )}
+      />
     </SafeAreaView>
   );
 };

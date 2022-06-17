@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Camera, PhotoFile, useCameraDevices} from 'react-native-vision-camera';
@@ -16,6 +16,8 @@ export const CameraScreen: React.FC = () => {
   const cameraBackDevice = devices.back;
   const camera = useRef<Camera>(null);
 
+  //States
+  const [photoState, setPhotoState] = useState<PhotoFile>();
   //Hooks
   const navigation = useNavigation<NavigationProps>();
   const navigateToGalleryScreen = () => navigation.navigate(GALLERY_ROUTE);
@@ -30,19 +32,13 @@ export const CameraScreen: React.FC = () => {
 
   const storePhoto = async (photo: PhotoFile) => {
     try {
-      await AsyncStorage.setItem(
-        '@photo_key',
-        JSON.stringify({
-          photo: photo,
-        }),
-      );
+      await AsyncStorage.setItem('@photo_key', JSON.stringify(photo));
     } catch (e) {
       Alert.alert(
         'Storing Error',
         'Had problem storing photo, please contact technical support.',
       );
       console.warn(e);
-      return photo;
     }
   };
 
@@ -51,9 +47,51 @@ export const CameraScreen: React.FC = () => {
       Alert.alert('No active camera. ');
     } else {
       const photo: PhotoFile = await camera.current.takePhoto();
-      storePhoto(photo);
+      setPhotoState(photo);
+      if (!photoState) {
+        Alert.alert('No photo @takePhotoAndStoreIt');
+      } else {
+        storePhoto(photoState);
+        addMultiplePhotos();
+      }
     }
   };
+
+  const addMultiplePhotos = async () => {
+    const photoToBeSaved = {photo: photoState, path: photoState?.path};
+    const existingPhotos = await AsyncStorage.getItem('@photo_key');
+
+    if (existingPhotos) {
+      let newPhoto: Array<{
+        photo: PhotoFile | undefined;
+        path: string | undefined;
+      }> = [JSON.parse(existingPhotos)];
+
+      if (!newPhoto) {
+        newPhoto = [];
+      } else {
+        newPhoto.push(photoToBeSaved);
+      }
+      await AsyncStorage.setItem('@photo_key', JSON.stringify(newPhoto));
+    } else {
+      Alert.alert('No newPhoto @takePhotoAndStoreIt');
+    }
+  };
+
+  // const addNewPhoto = async (photo, path) => {
+  //   let existingPhotos = await getExistingPhotos();
+  //   const updatedPhotos = [...existingPhotos, [photo, path]];
+  //   console.log('Updated photos', updatedPhotos);
+  //   await AsyncStorage.setItem('@following', JSON.stringify(updatedFollowers));
+  // };
+
+  // const getExistingPhotos = async () => {
+  //   let existingPhotos = await AsyncStorage.getItem('@photo_key');
+  //   console.log('existing photos', existingPhotos);
+  //   if (existingPhotos) {
+  //     JSON.parse(existingPhotos);
+  //   }
+  // };
   return (
     <SafeAreaView style={styles.safeAreaView}>
       {!hasBackCamera && (
