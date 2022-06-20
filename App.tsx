@@ -1,7 +1,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
-import {HOME_ROUTE, CAMERA_ROUTE, GALLERY_ROUTE} from './src/routes/routes';
+import React from 'react';
+import {CAMERA_ROUTE, GALLERY_ROUTE, HOME_ROUTE} from './src/routes/routes';
 import {CameraScreen} from './src/screens/CameraScreen/';
 import {GalleryScreen} from './src/screens/GalleryScreen';
 import {HomeScreen} from './src/screens/HomeScreen';
@@ -17,7 +17,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={HOME_ROUTE}>
+      <Stack.Navigator initialRouteName={CAMERA_ROUTE}>
         <Stack.Screen
           name={HOME_ROUTE}
           component={HomeScreen}

@@ -8,6 +8,7 @@ import {checkCameraPermission} from '../../permissions/checkCameraPermission';
 import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
 import {GALLERY_ROUTE} from '../../routes';
 import {NavigationProps} from '../../types/NavigationProps';
+import {photoKey} from '../../utils/global_variables/photoKey';
 import {styles} from './styles';
 
 export const CameraScreen: React.FC = () => {
@@ -28,18 +29,6 @@ export const CameraScreen: React.FC = () => {
   const hasBackCamera =
     cameraBackDevice !== null && cameraBackDevice !== undefined;
 
-  // const storePhoto = async (photo: PhotoFile) => {
-  //   try {
-  //     await AsyncStorage.setItem('@photo_key', JSON.stringify(photo));
-  //   } catch (e) {
-  //     Alert.alert(
-  //       'Storing Error',
-  //       'Had problem storing photo, please contact technical support.',
-  //     );
-  //     console.warn(e);
-  //   }
-  // };
-
   const takePhotoAndStoreIt = async () => {
     if (!camera || !camera.current) {
       Alert.alert('No active camera. ');
@@ -54,34 +43,20 @@ export const CameraScreen: React.FC = () => {
   };
 
   const addMultiplePhotos = async (photo: PhotoFile) => {
-    const existingPhotoStringify = await AsyncStorage.getItem('@photo_key');
+    const existingPhotoStringify = await AsyncStorage.getItem(photoKey);
 
-    const existingPhotos: PhotoFile[] = existingPhotoStringify
+    let existingPhotos: PhotoFile[] = existingPhotoStringify
       ? JSON.parse(existingPhotoStringify)
       : [];
 
     if (existingPhotos) {
       existingPhotos.push(photo);
-      await AsyncStorage.setItem('@photo_key', JSON.stringify(existingPhotos));
+      await AsyncStorage.setItem(photoKey, JSON.stringify(existingPhotos));
     } else {
       Alert.alert('No newPhoto @takePhotoAndStoreIt');
     }
   };
 
-  // const addNewPhoto = async (photo, path) => {
-  //   let existingPhotos = await getExistingPhotos();
-  //   const updatedPhotos = [...existingPhotos, [photo, path]];
-  //   console.log('Updated photos', updatedPhotos);
-  //   await AsyncStorage.setItem('@following', JSON.stringify(updatedFollowers));
-  // };
-
-  // const getExistingPhotos = async () => {
-  //   let existingPhotos = await AsyncStorage.getItem('@photo_key');
-  //   console.log('existing photos', existingPhotos);
-  //   if (existingPhotos) {
-  //     JSON.parse(existingPhotos);
-  //   }
-  // };
   return (
     <SafeAreaView style={styles.safeAreaView}>
       {!hasBackCamera && (
