@@ -10,12 +10,14 @@ import {GALLERY_ROUTE} from '../../routes';
 import {NavigationProps} from '../../types/NavigationProps';
 import {photoKey} from '../../utils/global_variables/photoKey';
 import {styles} from './styles';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export const CameraScreen: React.FC = () => {
   //All variables for Vision camera
   const devices = useCameraDevices();
   const cameraBackDevice = devices.back;
   const camera = useRef<Camera>(null);
+  const myIcon = <Icon name="rocket" size={30} color="#900" />;
 
   //Hooks
   const navigation = useNavigation<NavigationProps>();
@@ -77,13 +79,13 @@ export const CameraScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.takePictureBtn}
             onPress={takePhotoAndStoreIt}>
-            <Text> Shoot </Text>
+            <Icon name="camera" size={30} color="#100" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.galleryButton}
             onPress={navigateToGalleryScreen}>
-            <Text> Gallery </Text>
+            <Icon name="photo" size={30} color="#100" />
           </TouchableOpacity>
         </>
       )}

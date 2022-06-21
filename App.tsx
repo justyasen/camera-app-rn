@@ -39,12 +39,12 @@ const App = () => {
         <Stack.Screen
           name={CAMERA_ROUTE}
           component={CameraScreen}
-          options={{headerShown: false, title: 'Take a picture! '}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={GALLERY_ROUTE}
           component={GalleryScreen}
-          options={{headerShown: true}}
+          options={{headerTransparent: false, title: ''}}
         />
       </Stack.Navigator>
     </NavigationContainer>
