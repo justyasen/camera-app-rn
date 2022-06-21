@@ -1,6 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {CAMERA_ROUTE, GALLERY_ROUTE, HOME_ROUTE} from './src/routes/routes';
 import {CameraScreen} from './src/screens/CameraScreen/';
 import {GalleryScreen} from './src/screens/GalleryScreen';
@@ -13,8 +14,17 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const clearAsyncStorage = async () => {
+  AsyncStorage.clear();
+};
 
 const App = () => {
+  useEffect(() => {
+    return () => {
+      clearAsyncStorage;
+    };
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={CAMERA_ROUTE}>

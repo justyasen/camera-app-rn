@@ -4,8 +4,8 @@ import {Alert, FlatList, Image, Text, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {PhotoFile} from 'react-native-vision-camera';
 import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
-import {styles} from './styles';
 import {photoKey} from '../../utils/global_variables/photoKey';
+import {styles} from './styles';
 
 export const GalleryScreen: React.FC = () => {
   //Hooks
