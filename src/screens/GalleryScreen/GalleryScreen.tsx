@@ -1,15 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Alert, FlatList, Image, Text, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {PhotoFile} from 'react-native-vision-camera';
 import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
+import {VIDEO_ROUTE} from '../../routes';
+import {NavigationProps} from '../../types/NavigationProps';
 import {photoKey} from '../../utils/global_variables/photoKey';
 import {styles} from './styles';
 
 export const GalleryScreen: React.FC = () => {
   //Hooks
   const [photoArray, setPhotoArrayState] = useState<PhotoFile[]>();
+  const navigation = useNavigation<NavigationProps>();
+  const navigateToVideoScreen = () => navigation.navigate(VIDEO_ROUTE);
 
   useEffect(() => {
     hasAndroidPermission();
@@ -78,6 +83,9 @@ export const GalleryScreen: React.FC = () => {
   }
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.videoText} onPress={navigateToVideoScreen}>
+        Looking for videos? Press me{' '}
+      </Text>
       <FlatList data={photoArray} renderItem={renderItem} />
     </SafeAreaView>
   );

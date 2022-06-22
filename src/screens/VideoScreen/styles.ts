@@ -9,10 +9,9 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#fff',
   },
-  image: {
+  video: {
     height: 350,
     width: 350,
-    resizeMode: 'contain', //so it can resize depending on device size
     justifyContent: 'space-between',
     alignContent: 'center',
     marginLeft: 15,
@@ -26,10 +25,5 @@ export const styles = StyleSheet.create({
     margin: 3,
     backgroundColor: '#fff',
     flex: 1.8,
-  },
-  videoText: {
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
   },
 });
