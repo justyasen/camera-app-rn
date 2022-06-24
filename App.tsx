@@ -3,22 +3,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
-import {
-  CAMERA_ROUTE,
-  GALLERY_ROUTE,
-  HOME_ROUTE,
-  VIDEO_ROUTE,
-} from './src/routes/routes';
+import {CAMERA_ROUTE, GALLERY_ROUTE, HOME_ROUTE} from './src/routes/routes';
 import {CameraScreen} from './src/screens/CameraScreen/';
 import {GalleryScreen} from './src/screens/GalleryScreen';
 import {HomeScreen} from './src/screens/HomeScreen';
-import {VideoScreen} from './src/screens/VideoScreen';
 
 export type RootStackParamList = {
   HomeScreen: undefined;
   CameraScreen: undefined;
   GalleryScreen: undefined;
-  VideoScreen: undefined;
 };
 //Ignoring warnings for ViewPropTypes
 if (__DEV__) {
@@ -78,11 +71,6 @@ const App = () => {
           name={GALLERY_ROUTE}
           component={GalleryScreen}
           options={{title: '', headerShown: true}}
-        />
-        <Stack.Screen
-          name={VIDEO_ROUTE}
-          component={VideoScreen}
-          options={{title: 'Videos', headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>

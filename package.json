@@ -16,6 +16,7 @@
     "@react-native-community/cli": "^7.0.3",
     "@react-native-firebase/app": "^14.9.3",
     "@react-native-firebase/firestore": "^14.9.3",
+    "@react-native-picker/picker": "^2.4.2",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.2",
     "fbjs": "^3.0.4",
