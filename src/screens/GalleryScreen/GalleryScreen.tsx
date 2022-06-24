@@ -80,7 +80,7 @@ export const GalleryScreen: React.FC = () => {
    * @param item is taken from FlatList and used to render video inside Video component.
    * @returns a Video component.
    */
-  const renderVideo = ({item}: any) => (
+  const renderVideo = ({item}: {item: VideoFile}) => (
     <TouchableOpacity
       style={videoStyles.container}
       onLongPress={() => {
@@ -136,7 +136,7 @@ export const GalleryScreen: React.FC = () => {
     }
   };
 
-  const renderPhoto = ({item}: any) => (
+  const renderPhoto = ({item}: {item: PhotoFile}) => (
     <TouchableOpacity
       style={photoStyles.container}
       onLongPress={() => {
