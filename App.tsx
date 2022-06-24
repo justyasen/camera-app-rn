@@ -40,6 +40,7 @@ if (__DEV__) {
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
 const clearAsyncStorage = async () => {
   AsyncStorage.clear();
 };
