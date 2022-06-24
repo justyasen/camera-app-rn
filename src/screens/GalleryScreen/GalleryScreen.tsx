@@ -21,6 +21,7 @@ export const GalleryScreen: React.FC = () => {
   const [videoArray, setVideoArrayState] = useState<VideoFile[]>();
   const [pickerState, setPickerState] = useState<MediaTypes>('photo');
 
+  //useEffects
   useEffect(() => {
     hasAndroidPermission();
   }, []);
@@ -41,13 +42,12 @@ export const GalleryScreen: React.FC = () => {
       const videoArrayFromLocalStorage = await AsyncStorage.getItem(videoKey);
       if (videoArrayFromLocalStorage === null) {
         Alert.alert('No videos from local storage');
-      } else {
-        const videoArrayJSON: VideoFile[] = JSON.parse(
-          videoArrayFromLocalStorage,
-        );
-        setVideoArrayState(videoArrayJSON);
-        console.log('Got video! ');
+        return;
       }
+      const videoArrayJSON: VideoFile[] = JSON.parse(
+        videoArrayFromLocalStorage,
+      );
+      setVideoArrayState(videoArrayJSON);
     } catch (error) {
       Alert.alert('Something went wrong at VideoScreen VideoJSON');
       console.warn(error);
@@ -64,12 +64,13 @@ export const GalleryScreen: React.FC = () => {
   const deleteSelectedVideo = async (path: string) => {
     if (videoArray === undefined) {
       Alert.alert('No videos @deleteSelectedPhoto');
-      return undefined;
+      return;
     }
     const videoArrayAfterDeleted = videoArray.filter(
       video => video.path !== path,
     );
     setVideoArrayState(videoArrayAfterDeleted);
+
     await AsyncStorage.setItem(videoKey, JSON.stringify(videoArray));
     Alert.alert('Deleted video.');
   };
@@ -79,7 +80,7 @@ export const GalleryScreen: React.FC = () => {
    * @param item is taken from FlatList and used to render video inside Video component.
    * @returns a Video component.
    */
-  const renderVideo = ({item}) => (
+  const renderVideo = ({item}: any) => (
     <TouchableOpacity
       style={videoStyles.container}
       onLongPress={() => {
@@ -101,13 +102,14 @@ export const GalleryScreen: React.FC = () => {
   const deleteSelectedPhoto = async (path: string) => {
     if (photoArray === undefined) {
       Alert.alert('No photos @deleteSelectedPhoto');
-      return undefined;
+      return;
     }
     const photoArrayAfterDeleted = photoArray.filter(
       photo => photo.path !== path,
     );
     setPhotoArrayState(photoArrayAfterDeleted);
     await AsyncStorage.setItem(photoKey, JSON.stringify(photoArray));
+    Alert.alert('Deleted selected photo.');
   };
 
   /**
@@ -117,27 +119,28 @@ export const GalleryScreen: React.FC = () => {
   const getPhoto = async () => {
     try {
       const photoArrayFromLocalStorage = await AsyncStorage.getItem(photoKey);
+      //Guard
       if (photoArrayFromLocalStorage === null) {
         Alert.alert('No photos from local storage');
-      } else {
-        const photoArrayJSON: PhotoFile[] = JSON.parse(
-          photoArrayFromLocalStorage,
-        );
-        setPhotoArrayState(photoArrayJSON);
-        console.log('Got photo! ');
+        return;
       }
+
+      const photoArrayJSON: PhotoFile[] = JSON.parse(
+        photoArrayFromLocalStorage,
+      );
+
+      setPhotoArrayState(photoArrayJSON);
     } catch (error) {
       Alert.alert('Something went wrong at GalleryScreen PhotoJSON');
-      console.warn(error);
+      console.error(error);
     }
   };
 
-  const renderPhoto = ({item}) => (
+  const renderPhoto = ({item}: any) => (
     <TouchableOpacity
       style={photoStyles.container}
       onLongPress={() => {
         deleteSelectedPhoto(item.path);
-        Alert.alert('Photo deleted');
       }}>
       <Image style={photoStyles.image} source={{uri: 'file://' + item.path}} />
     </TouchableOpacity>
