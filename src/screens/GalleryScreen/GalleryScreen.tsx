@@ -1,28 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Picker} from '@react-native-picker/picker';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  Alert,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {FlatList, Image, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import Video from 'react-native-video';
 import {PhotoFile, VideoFile} from 'react-native-vision-camera';
 import {hasAndroidPermission} from '../../permissions/hasAndroidPermission';
+import {CAMERA_ROUTE} from '../../routes';
 import {MediaTypes} from '../../types/MediaTypes';
+import {NavigationProps} from '../../types/NavigationProps';
+import {GENERIC_ERROR_MESSAGE} from '../../utils/error_messages/err_msgs';
 import {photoKey} from '../../utils/global_variables/photoKey';
 import {videoKey} from '../../utils/global_variables/videoKey';
-import {photoStyles} from './photoStyles';
-import {videoStyles} from './videoStyles';
-import Toast from 'react-native-toast-message';
-import {GENERIC_ERROR_MESSAGE} from '../../utils/error_messages/err_msgs';
+import {noMediaStyles, onNullRender, photoStyles, videoStyles} from './styles';
 
 export const GalleryScreen: React.FC = () => {
   //Hooks
+  const navigation = useNavigation<NavigationProps>();
+  const navigateToCameraScreen = () => navigation.navigate(CAMERA_ROUTE);
 
   //States
   const [isMediaPhoto, setIsMediaPhoto] = useState<boolean>(true);
@@ -86,6 +83,9 @@ export const GalleryScreen: React.FC = () => {
       video => video.path !== path,
     );
     setVideoArrayState(videoArrayAfterDeleted);
+    if (videoArrayAfterDeleted.length === 0) {
+      setVideoArrayState(undefined);
+    }
 
     await AsyncStorage.setItem(videoKey, JSON.stringify(videoArray));
     Toast.show({
@@ -101,7 +101,7 @@ export const GalleryScreen: React.FC = () => {
    */
   const renderVideo = ({item}: {item: VideoFile}) => (
     <TouchableOpacity
-      style={videoStyles.container}
+      style={videoStyles.containerVideo}
       onLongPress={() => {
         deleteSelectedVideo(item.path);
       }}>
@@ -129,6 +129,10 @@ export const GalleryScreen: React.FC = () => {
       photo => photo.path !== path,
     );
     setPhotoArrayState(photoArrayAfterDeleted);
+    if (photoArrayAfterDeleted.length === 0) {
+      setVideoArrayState(undefined);
+      await AsyncStorage.removeItem(photoKey);
+    }
     await AsyncStorage.setItem(photoKey, JSON.stringify(photoArray));
     Toast.show({
       type: 'success',
@@ -163,7 +167,7 @@ export const GalleryScreen: React.FC = () => {
 
   const renderPhoto = ({item}: {item: PhotoFile}) => (
     <TouchableOpacity
-      style={photoStyles.container}
+      style={photoStyles.containerPhoto}
       onLongPress={() => {
         deleteSelectedPhoto(item.path);
       }}>
@@ -181,8 +185,24 @@ export const GalleryScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={photoStyles.container}>
-      <View style={photoStyles.viewStyle}>
+    <SafeAreaView style={photoStyles.containerPhoto}>
+      {photoArray === undefined && (
+        <View style={noMediaStyles.viewStyle}>
+          <Text style={noMediaStyles.mainText}>
+            There are no photos to show. Take one to see it here!
+          </Text>
+          <TouchableOpacity
+            onPress={navigateToCameraScreen}
+            style={noMediaStyles.touchableOpacity}>
+            <Text style={noMediaStyles.btnText}> Take a photo </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {videoArray === undefined && (
+        <Text>There are no videos to show. Take one to see it here!</Text>
+      )}
+
+      <View>
         <Picker
           mode="dropdown"
           style={photoStyles.dropdown}
@@ -192,6 +212,7 @@ export const GalleryScreen: React.FC = () => {
           <Picker.Item label="Videos" value="video" />
         </Picker>
       </View>
+
       {isMediaPhoto && <FlatList data={photoArray} renderItem={renderPhoto} />}
       {!isMediaPhoto && <FlatList data={videoArray} renderItem={renderVideo} />}
     </SafeAreaView>
