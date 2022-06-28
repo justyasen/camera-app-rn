@@ -41,7 +41,6 @@ export const photoStyles = StyleSheet.create({
     borderRadius: 4,
   },
   dropdown: {
-    height: 50,
-    width: 200,
+    flexDirection: 'column',
   },
 });
