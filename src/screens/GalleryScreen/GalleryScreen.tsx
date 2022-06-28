@@ -1,7 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Picker} from '@react-native-picker/picker';
 import React, {useEffect, useState} from 'react';
-import {Alert, FlatList, Image, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Video from 'react-native-video';
 import {PhotoFile, VideoFile} from 'react-native-vision-camera';
@@ -11,6 +18,8 @@ import {photoKey} from '../../utils/global_variables/photoKey';
 import {videoKey} from '../../utils/global_variables/videoKey';
 import {photoStyles} from './photoStyles';
 import {videoStyles} from './videoStyles';
+import Toast from 'react-native-toast-message';
+import {GENERIC_ERROR_MESSAGE} from '../../utils/error_messages/err_msgs';
 
 export const GalleryScreen: React.FC = () => {
   //Hooks
@@ -41,7 +50,10 @@ export const GalleryScreen: React.FC = () => {
     try {
       const videoArrayFromLocalStorage = await AsyncStorage.getItem(videoKey);
       if (videoArrayFromLocalStorage === null) {
-        Alert.alert('No videos from local storage');
+        Toast.show({
+          type: 'error',
+          text1: "There aren't any videos to show. Go take one! ",
+        });
         return;
       }
       const videoArrayJSON: VideoFile[] = JSON.parse(
@@ -49,8 +61,10 @@ export const GalleryScreen: React.FC = () => {
       );
       setVideoArrayState(videoArrayJSON);
     } catch (error) {
-      Alert.alert('Something went wrong at VideoScreen VideoJSON');
-      console.warn(error);
+      Toast.show({
+        type: 'error',
+        text1: GENERIC_ERROR_MESSAGE,
+      });
     }
   };
 
@@ -63,7 +77,9 @@ export const GalleryScreen: React.FC = () => {
    */
   const deleteSelectedVideo = async (path: string) => {
     if (videoArray === undefined) {
-      Alert.alert('No videos @deleteSelectedPhoto');
+      Toast.show({
+        text1: 'No videos to delete. ',
+      });
       return;
     }
     const videoArrayAfterDeleted = videoArray.filter(
@@ -72,7 +88,10 @@ export const GalleryScreen: React.FC = () => {
     setVideoArrayState(videoArrayAfterDeleted);
 
     await AsyncStorage.setItem(videoKey, JSON.stringify(videoArray));
-    Alert.alert('Deleted video.');
+    Toast.show({
+      type: 'success',
+      text1: 'Video has been deleted successfully.',
+    });
   };
 
   /**
@@ -101,7 +120,9 @@ export const GalleryScreen: React.FC = () => {
    */
   const deleteSelectedPhoto = async (path: string) => {
     if (photoArray === undefined) {
-      Alert.alert('No photos @deleteSelectedPhoto');
+      Toast.show({
+        text1: 'No photos to delete. ',
+      });
       return;
     }
     const photoArrayAfterDeleted = photoArray.filter(
@@ -109,7 +130,10 @@ export const GalleryScreen: React.FC = () => {
     );
     setPhotoArrayState(photoArrayAfterDeleted);
     await AsyncStorage.setItem(photoKey, JSON.stringify(photoArray));
-    Alert.alert('Deleted selected photo.');
+    Toast.show({
+      type: 'success',
+      text1: 'Photo has been deleted successfully.',
+    });
   };
 
   /**
@@ -121,7 +145,6 @@ export const GalleryScreen: React.FC = () => {
       const photoArrayFromLocalStorage = await AsyncStorage.getItem(photoKey);
       //Guard
       if (photoArrayFromLocalStorage === null) {
-        Alert.alert('No photos from local storage');
         return;
       }
 
@@ -131,8 +154,10 @@ export const GalleryScreen: React.FC = () => {
 
       setPhotoArrayState(photoArrayJSON);
     } catch (error) {
-      Alert.alert('Something went wrong at GalleryScreen PhotoJSON');
-      console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Something went wrong, please try again later. ',
+      });
     }
   };
 
@@ -159,6 +184,7 @@ export const GalleryScreen: React.FC = () => {
     <SafeAreaView style={photoStyles.container}>
       <View style={photoStyles.viewStyle}>
         <Picker
+          mode="dropdown"
           style={photoStyles.dropdown}
           selectedValue={pickerState}
           onValueChange={onValueChange}>

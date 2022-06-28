@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -17,12 +17,19 @@ import {photoKey} from '../../utils/global_variables/photoKey';
 import {styles} from './styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {videoKey} from '../../utils/global_variables/videoKey';
+import Toast from 'react-native-toast-message';
+import {GENERIC_ERROR_MESSAGE} from '../../utils/error_messages/err_msgs';
+import {VideoIcon} from '../../types/VideoIcon';
 
 export const CameraScreen: React.FC = () => {
   //All variables for Vision camera
   const devices = useCameraDevices();
   const cameraBackDevice = devices.back;
   const camera = useRef<Camera>(null);
+
+  //State
+  const [videoIcon, setVideoIcon] = useState<VideoIcon>('video-camera');
+  const [isRecording, setIsRecording] = useState(false);
 
   //Hooks
   const navigation = useNavigation<NavigationProps>();
@@ -39,13 +46,19 @@ export const CameraScreen: React.FC = () => {
   //START OF PHOTO FUNCTIONS
   const takePhotoAndStoreIt = async () => {
     if (!camera || !camera.current) {
-      Alert.alert('No active camera. @takePhotoAndStoreIt');
+      Toast.show({
+        type: 'error',
+        text1: GENERIC_ERROR_MESSAGE,
+      });
     } else {
       const photo: PhotoFile = await camera.current.takePhoto({
         qualityPrioritization: 'speed',
       });
       if (!photo) {
-        Alert.alert('No photo @takePhotoAndStoreIt');
+        Toast.show({
+          type: 'warning',
+          text1: 'Take a picture first! ',
+        });
       } else {
         addMultiplePhotos(photo);
       }
@@ -63,7 +76,11 @@ export const CameraScreen: React.FC = () => {
       existingPhotos.push(photo);
       await AsyncStorage.setItem(photoKey, JSON.stringify(existingPhotos));
     } else {
-      Alert.alert('No newPhoto @addMultiplePhotos');
+      Toast.show({
+        type: 'error',
+        text1: GENERIC_ERROR_MESSAGE,
+      });
+      return;
     }
   };
   //END OF PHOTO FUNCTIONS
@@ -71,20 +88,30 @@ export const CameraScreen: React.FC = () => {
   //START OF VIDEO FUNCTIONS
   const takeVideoAndStoreIt = () => {
     if (!camera || !camera.current) {
-      Alert.alert('No active camera. @takeVideoAndStoreIt');
+      Toast.show({
+        text1: 'No active camera. ',
+        type: 'error',
+      });
     } else {
       camera.current.startRecording({
         flash: 'off',
         onRecordingFinished: vid => {
           addMultipleVideos(vid);
-          console.log(vid);
         },
-        onRecordingError: error => console.error(error),
+        onRecordingError: () => {
+          Toast.show({
+            type: 'error',
+            text1: GENERIC_ERROR_MESSAGE,
+          });
+        },
       });
-      setTimeout(() => {
-        camera.current?.stopRecording();
-        console.log('Recording done');
-      }, 3000);
+
+      if (videoIcon === 'video-camera') {
+        setVideoIcon('stop-circle');
+      } else {
+        setVideoIcon('video-camera');
+      }
+      setIsRecording(true);
     }
   };
 
@@ -99,11 +126,21 @@ export const CameraScreen: React.FC = () => {
       existingVideos.push(video);
       await AsyncStorage.setItem(videoKey, JSON.stringify(existingVideos));
     } else {
-      Alert.alert('No video @addMultipleVideos');
+      Toast.show({
+        type: 'error',
+        text1: GENERIC_ERROR_MESSAGE,
+      });
     }
   };
-  //END OF VIDEO FUNCTIONS
 
+  const stopRecordingVideo = () => {
+    if (!camera || !camera.current) {
+      return;
+    }
+    camera.current.stopRecording();
+    setVideoIcon('video-camera');
+  };
+  //END OF VIDEO FUNCTIONS
   return (
     <SafeAreaView style={styles.safeAreaView}>
       {!hasBackCamera && (
@@ -124,8 +161,8 @@ export const CameraScreen: React.FC = () => {
 
           <TouchableOpacity
             style={styles.takePictureBtn}
-            onLongPress={takeVideoAndStoreIt}
-            onPress={takePhotoAndStoreIt}>
+            onPress={takePhotoAndStoreIt}
+            onLongPress={takeVideoAndStoreIt}>
             <Icon name="camera" size={30} color="#100" />
           </TouchableOpacity>
 
@@ -134,6 +171,20 @@ export const CameraScreen: React.FC = () => {
             onPress={navigateToGalleryScreen}>
             <Icon name="photo" size={30} color="#100" />
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.videoButton}
+            onPress={takeVideoAndStoreIt}>
+            <Icon name={videoIcon} size={30} color="#100" />
+          </TouchableOpacity>
+
+          {isRecording && (
+            <TouchableOpacity
+              style={styles.stopButton}
+              onPress={stopRecordingVideo}>
+              <Icon name={videoIcon} size={30} color="#100" />
+            </TouchableOpacity>
+          )}
         </>
       )}
     </SafeAreaView>

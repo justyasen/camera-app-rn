@@ -7,6 +7,7 @@ import {CAMERA_ROUTE, GALLERY_ROUTE, HOME_ROUTE} from './src/routes/routes';
 import {CameraScreen} from './src/screens/CameraScreen/';
 import {GalleryScreen} from './src/screens/GalleryScreen';
 import {HomeScreen} from './src/screens/HomeScreen';
+import Toast from 'react-native-toast-message';
 
 export type RootStackParamList = {
   HomeScreen: undefined;
@@ -74,6 +75,7 @@ const App = () => {
           options={{title: '', headerShown: true}}
         />
       </Stack.Navigator>
+      <Toast />
     </NavigationContainer>
   );
 };
