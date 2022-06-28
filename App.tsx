@@ -72,7 +72,7 @@ const App = () => {
         <Stack.Screen
           name={GALLERY_ROUTE}
           component={GalleryScreen}
-          options={{title: '', headerShown: true}}
+          options={{title: 'Gallery', headerShown: true}}
         />
       </Stack.Navigator>
       <Toast />
